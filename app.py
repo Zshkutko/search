@@ -17,14 +17,12 @@ count_vectorizer = pickle.load(open('vec_data/count_vec.pickle', 'rb'))
 tfidf_vectorizer = pickle.load(open('vec_data/tf-idf.pickle', 'rb'))
 bm25_vectorizer = pickle.load(open('vec_data/bm25.pickle', 'rb'))
 
-
 @st.cache(allow_output_mutation=True)
 def upload():
     tiny_bert_tokenizer = AutoTokenizer.from_pretrained("cointegrated/rubert-tiny")
     tiny_bert_model = AutoModel.from_pretrained("cointegrated/rubert-tiny")
     fast_text_model = KeyedVectors.load('araneum_none_fasttextcbow_300_5_2018.model')
     return tiny_bert_tokenizer, tiny_bert_model, fast_text_model
-
 
 def file(filename):
     with open(filename, 'r', encoding='utf-8') as f:
@@ -105,7 +103,7 @@ def query_count_vec(query):
 
 
 def query_bm25(query):
-    return bm25_vectorizer.transform(query)
+    return tfidf_vectorizer.transform(query)
 
 
 def search(corpus, embeddings, query):
@@ -126,6 +124,7 @@ query_string = st.text_input('search')
 def main(option, query):
     num_answers = 5
     corpus = file('questions_about_love.jsonl')[0]
+    print(corpus[:10])
     if option == 'BERT':
         start = time.time()
         bert_matrix = sparse.load_npz('index_data/bert_answers.npz')
